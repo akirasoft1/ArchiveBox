@@ -1,5 +1,3 @@
-__package__ = 'archivebox.search'
-
 from pathlib import Path
 from typing import List, Union
 
@@ -8,6 +6,7 @@ from django.conf import settings
 
 import abx
 import archivebox
+from archivebox.config import CONSTANTS
 from archivebox.index.schema import Link
 from archivebox.misc.util import enforce_types
 from archivebox.misc.logging import stderr
@@ -63,7 +62,7 @@ def import_backend():
     raise Exception(f'Could not load {SEARCH_BACKEND_CONFIG.SEARCH_BACKEND_ENGINE} as search backend')
 
 @enforce_types
-def write_search_index(link: Link, texts: Union[List[str], None]=None, out_dir: Path=settings.DATA_DIR, skip_text_index: bool=False) -> None:
+def write_search_index(link: Link, texts: Union[List[str], None]=None, out_dir: Path=CONSTANTS.DATA_DIR, skip_text_index: bool=False) -> None:
     if not SEARCH_BACKEND_CONFIG.USE_INDEXING_BACKEND:
         return
 
@@ -83,7 +82,7 @@ def write_search_index(link: Link, texts: Union[List[str], None]=None, out_dir: 
                 )
 
 @enforce_types
-def query_search_index(query: str, out_dir: Path=settings.DATA_DIR) -> QuerySet:
+def query_search_index(query: str, out_dir: Path=CONSTANTS.DATA_DIR) -> QuerySet:
     from core.models import Snapshot
 
     if SEARCH_BACKEND_CONFIG.USE_SEARCHING_BACKEND:
@@ -120,7 +119,7 @@ def flush_search_index(snapshots: QuerySet):
         )
 
 @enforce_types
-def index_links(links: Union[List[Link],None], out_dir: Path=settings.DATA_DIR):
+def index_links(links: Union[List[Link],None], out_dir: Path=CONSTANTS.DATA_DIR):
     if not links:
         return
 

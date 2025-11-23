@@ -12,9 +12,9 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 
 from archivebox.config import CONSTANTS
-from base_models.models import ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelWithKVTags, ModelWithOutputDir, ModelWithConfig, ModelWithNotes, ABIDModel, ABIDField, AutoDateTimeField, ModelWithHealthStats, get_or_create_system_user_pk
-from workers.models import ModelWithStateMachine
-from tags.models import KVTag, GenericRelation
+from archivebox.base_models.models import ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelWithKVTags, ModelWithOutputDir, ModelWithConfig, ModelWithNotes, ABIDModel, ABIDField, AutoDateTimeField, ModelWithHealthStats, get_or_create_system_user_pk
+from archivebox.workers.models import ModelWithStateMachine
+from archivebox.tags.models import KVTag, GenericRelation
 
 if TYPE_CHECKING:
     from core.models import Snapshot, ArchiveResult
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 
 
-class Seed(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelWithKVTags, ABIDModel, ModelWithOutputDir, ModelWithConfig, ModelWithNotes, ModelWithHealthStats):
+class Seed(ModelWithOutputDir, ModelWithConfig, ModelWithNotes, ModelWithHealthStats):
     """
     A fountain that produces URLs (+metadata) each time it's queried e.g.
         - file:///data/sources/2024-01-02_11-57-51__cli_add.txt
@@ -45,6 +45,14 @@ class Seed(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelWi
     
     ### ModelWithReadOnlyFields:
     read_only_fields = ('id', 'abid', 'created_at', 'created_by', 'uri')
+
+    ### ABIDModel:
+    abid_prefix = 'src_'
+    abid_ts_src = 'self.created_at'
+    abid_uri_src = 'self.uri'
+    abid_subtype_src = 'self.extractor'
+    abid_rand_src = 'self.id'
+    abid_drift_allowed = True
     
     ### Immutable fields
     id = models.UUIDField(primary_key=True, default=None, null=False, editable=False, unique=True, verbose_name='ID')
@@ -73,20 +81,10 @@ class Seed(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelWi
         related_query_name="seed",
         content_type_field="obj_type",
         object_id_field="obj_id",
-        order_by=('name',),
     )
     
-    ### ABIDModel:
-    abid_prefix = 'src_'
-    abid_ts_src = 'self.created_at'
-    abid_uri_src = 'self.uri'
-    abid_subtype_src = 'self.extractor'
-    abid_rand_src = 'self.id'
-    abid_drift_allowed = True
-    
     ### ModelWithOutputDir:
-    output_dir = models.FilePathField(path=settings.ARCHIVE_DIR, null=False, blank=True, default='', help_text='The directory to store the output of this crawl')
-    output_dir_template = 'archive/seeds/{self.created_at.strftime("%Y%m%d")}/{self.abid}'
+    output_dir = models.FilePathField(path=CONSTANTS.ARCHIVE_DIR, null=False, blank=True, default='', help_text='The directory to store the output of this crawl')
     output_dir_symlinks = [
         ('index.json',      'self.as_json()'),
         ('config.toml',     'benedict(self.config).as_toml()'),
@@ -157,7 +155,7 @@ class Seed(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelWi
 
 
 
-class CrawlSchedule(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelWithKVTags, ABIDModel, ModelWithNotes, ModelWithHealthStats):
+class CrawlSchedule(ModelWithSerializers, ABIDModel, ModelWithNotes, ModelWithHealthStats):
     """
     A record for a job that should run repeatedly on a given schedule.
     
@@ -195,7 +193,6 @@ class CrawlSchedule(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID
         related_query_name="crawlschedule",
         content_type_field="obj_type",
         object_id_field="obj_id",
-        order_by=('name',),
     )
     
     ### Managers:
@@ -274,7 +271,7 @@ class CrawlQuerySet(models.QuerySet):
 
 
 
-class Crawl(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelWithKVTags, ABIDModel, ModelWithOutputDir, ModelWithConfig, ModelWithHealthStats, ModelWithStateMachine):
+class Crawl(ModelWithOutputDir, ModelWithConfig, ModelWithHealthStats, ModelWithStateMachine):
     """
     A single session of URLs to archive starting from a given Seed and expanding outwards. An "archiving session" so to speak.
 
@@ -287,6 +284,14 @@ class Crawl(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelW
     
     ### ModelWithReadOnlyFields:
     read_only_fields = ('id', 'abid', 'created_at', 'created_by', 'seed')
+
+    ### ABIDModel:
+    abid_prefix = 'cwl_'
+    abid_ts_src = 'self.created_at'
+    abid_uri_src = 'self.seed.uri'
+    abid_subtype_src = 'self.persona'
+    abid_rand_src = 'self.id'
+    abid_drift_allowed = True
     
     ### Immutable fields:
     id = models.UUIDField(primary_key=True, default=None, null=False, editable=False, unique=True, verbose_name='ID')
@@ -312,7 +317,6 @@ class Crawl(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelW
         related_query_name="crawl",
         content_type_field="obj_type",
         object_id_field="obj_id",
-        order_by=('name',),
     )
     
     ### ModelWithStateMachine:
@@ -324,17 +328,9 @@ class Crawl(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelW
     
     status = ModelWithStateMachine.StatusField(choices=StatusChoices, default=StatusChoices.QUEUED)
     retry_at = ModelWithStateMachine.RetryAtField(default=timezone.now)
-
-    ### ABIDModel:
-    abid_prefix = 'cwl_'
-    abid_ts_src = 'self.created_at'
-    abid_uri_src = 'self.seed.uri'
-    abid_subtype_src = 'self.persona'
-    abid_rand_src = 'self.id'
-    abid_drift_allowed = True
     
     ### ModelWithOutputDir:
-    output_dir = models.FilePathField(path=settings.ARCHIVE_DIR, null=False, blank=True, default='', help_text='The directory to store the output of this crawl')
+    output_dir = models.FilePathField(path=CONSTANTS.ARCHIVE_DIR, null=False, blank=True, default='', help_text='The directory to store the output of this crawl')
     output_dir_template = 'archive/crawls/{getattr(crawl, crawl.abid_ts_src).strftime("%Y%m%d")}/{crawl.abid}'
     output_dir_symlinks = [
         ('index.json', 'self.as_json'),
@@ -431,7 +427,7 @@ class Crawl(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelW
         return root_snapshot
 
 
-class Outlink(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelWithKVTags):
+class Outlink(ModelWithSerializers, ModelWithUUID):
     """A record of a link found on a page, pointing to another page."""
     read_only_fields = ('id', 'src', 'dst', 'crawl', 'via')
     

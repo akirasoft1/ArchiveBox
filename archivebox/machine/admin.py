@@ -7,7 +7,7 @@ from django.utils.html import format_html
 
 from archivebox.base_models.admin import ABIDModelAdmin
 
-from machine.models import Machine, NetworkInterface, InstalledBinary
+from archivebox.machine.models import Machine, NetworkInterface, InstalledBinary
 
 
 

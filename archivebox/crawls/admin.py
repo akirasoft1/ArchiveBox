@@ -5,10 +5,11 @@ from django.contrib import admin
 
 from archivebox import DATA_DIR
 
+from archivebox.misc.paginators import AccelleratedPaginator
 from archivebox.base_models.admin import ABIDModelAdmin
 
 from core.models import Snapshot
-from crawls.models import Seed, Crawl, CrawlSchedule
+from archivebox.crawls.models import Crawl, Seed, CrawlSchedule
 
 
 class SeedAdmin(ABIDModelAdmin):

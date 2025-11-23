@@ -16,10 +16,10 @@ from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.functional import classproperty       # type: ignore
 
-from crawls.models import Crawl
+from archivebox.crawls.models import Crawl
 from core.models import Snapshot, ArchiveResult
 
-from workers.models import Event, Process, EventDict
+from archivebox.workers.models import Event, Process, EventDict
 
 
 class WorkerType:

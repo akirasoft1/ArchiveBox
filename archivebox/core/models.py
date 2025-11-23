@@ -1,7 +1,4 @@
-__package__ = 'archivebox.core'
-
-
-from typing import Optional, Dict, Iterable, Any
+from typing import Optional, Dict, Iterable, Any, Self
 from django_stubs_ext.db.models import TypedModelMeta
 
 import os
@@ -19,6 +16,7 @@ from django.core.cache import cache
 from django.urls import reverse, reverse_lazy
 from django.db.models import Case, When, IntegerField
 from django.contrib import admin
+from django.contrib.contenttypes.fields import GenericRelation
 from django.conf import settings
 
 
@@ -36,15 +34,15 @@ from archivebox.base_models.models import (
     ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelWithKVTags,  # ModelWithStateMachine
     ModelWithOutputDir, ModelWithConfig, ModelWithNotes, ModelWithHealthStats
 )
-from workers.models import ModelWithStateMachine
-from workers.tasks import bg_archive_snapshot
-from tags.models import KVTag
-# from machine.models import Machine, NetworkInterface
+from archivebox.workers.models import ModelWithStateMachine
+from archivebox.workers.tasks import bg_archive_snapshot
+from archivebox.tags.models import KVTag
+from archivebox.machine.models import Machine, NetworkInterface
 
-from crawls.models import Seed, Crawl, CrawlSchedule
+from archivebox.crawls.models import Seed, Crawl, CrawlSchedule
 
 
-class Tag(ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ABIDModel):
+class Tag(ModelWithSerializers, ABIDModel):
     """
     Old tag model, loosely based on django-taggit model + ABID base.
     
@@ -157,17 +155,19 @@ class SnapshotManager(models.Manager):
 
 
 class Snapshot(
-    ModelWithReadOnlyFields,
-    ModelWithSerializers,
-    ModelWithUUID,
-    ModelWithKVTags,
-    ABIDModel,
     ModelWithOutputDir,
     ModelWithConfig,
     ModelWithNotes,
     ModelWithHealthStats,
     ModelWithStateMachine,
 ):
+    ### ABIDModel
+    abid_prefix = 'snp_'
+    abid_ts_src = 'self.created_at'
+    abid_uri_src = 'self.url'
+    abid_subtype_src = '"01"'
+    abid_rand_src = 'self.id'
+    abid_drift_allowed = False
     
     ### ModelWithSerializers
     # cls.from_dict() -> Self
@@ -196,6 +196,12 @@ class Snapshot(
     modified_at = models.DateTimeField(auto_now=True)
     
     ### ModelWithStateMachine
+    state_machine_name = 'core.statemachines.SnapshotMachine'
+    retry_at_field_name = 'retry_at'
+    state_field_name = 'status'
+    StatusChoices = ModelWithStateMachine.StatusChoices
+    active_state = StatusChoices.STARTED
+    
     retry_at = ModelWithStateMachine.RetryAtField(default=timezone.now)
     status = ModelWithStateMachine.StatusField(choices=StatusChoices, default=StatusChoices.QUEUED)
     
@@ -222,12 +228,7 @@ class Snapshot(
         related_query_name="snapshot",
         content_type_field="obj_type",
         object_id_field="obj_id",
-        order_by=('created_at',),
     )
-    
-    ### ABIDModel
-    abid_prefix = 'snp_'
-    abid_ts_src = 'self.created_at'
     abid_uri_src = 'self.url'
     abid_subtype_src = '"01"'
     abid_rand_src = 'self.id'
@@ -624,7 +625,6 @@ class ArchiveResultManager(models.Manager):
 
 
 class ArchiveResult(
-    ModelWithReadOnlyFields, ModelWithSerializers, ModelWithUUID, ModelWithKVTags, ABIDModel,
     ModelWithOutputDir, ModelWithConfig, ModelWithNotes, ModelWithHealthStats, ModelWithStateMachine
 ):
     ### ABIDModel

@@ -6,9 +6,12 @@ import abx
 
 
 class MachineConfig(AppConfig):
+
+
     default_auto_field = 'django.db.models.BigAutoField'
-    
-    name = 'machine'
+
+
+    name = 'archivebox.machine'
     verbose_name = 'Machine Info'
 
 

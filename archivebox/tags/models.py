@@ -18,7 +18,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 
 
-from base_models.models import ABIDModel, ABIDField, AutoDateTimeField, get_or_create_system_user_pk
+from archivebox.base_models.base import AutoDateTimeField, get_or_create_system_user_pk, ModelWithReadOnlyFields
 
 FORBIDDEN_TAG_CHARS = ('=', '\n', '\t', '\r', ',', '\'', '"', '\\')
 
@@ -256,7 +256,6 @@ class ModelWithKVTags(ModelWithReadOnlyFields):
         # related_query_name="snapshot",       set this in subclasses, allows queries like KVTag.objects.filter(snapshot__url='https://example.com')
         content_type_field="obj_type",
         object_id_field="obj_id",
-        order_by=('name',),
     )
     kvtag_set = tag_set
     

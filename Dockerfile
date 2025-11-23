@@ -334,13 +334,22 @@ RUN ( \
 RUN --mount=type=bind,source=pyproject.toml,target=/app/pyproject.toml \
     --mount=type=bind,source=uv.lock,target=/app/uv.lock \
     --mount=type=cache,target=/root/.cache/uv,sharing=locked,id=uv-$TARGETARCH$TARGETVARIANT \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked,id=apt-$TARGETARCH$TARGETVARIANT \
     echo "[+] PIP Installing ArchiveBox dependencies from pyproject.toml and uv.lock..." \
+    && apt-get update -qq \
+    && apt-get install -qq -y --no-install-recommends \
+        build-essential gcc \
+        python3-dev libssl-dev libldap2-dev libsasl2-dev \
     && uv sync \
         --frozen \
         --inexact \
         --all-extras \
         --no-install-project \
-        --no-install-workspace
+        --no-install-workspace \
+    && apt-get purge -y \
+        python3-dev build-essential gcc \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
     # installs the pip packages that archivebox depends on, defined in pyproject.toml and uv.lock dependencies
 
 # Install ArchiveBox Python package + workspace dependencies from source
@@ -396,4 +405,4 @@ HEALTHCHECK --interval=30s --timeout=20s --retries=15 \
     CMD curl --silent 'http://localhost:8000/health/' | grep -q 'OK'
 
 ENTRYPOINT ["dumb-init", "--", "/app/bin/docker_entrypoint.sh"]
-CMD ["archivebox", "server", "--quick-init", "0.0.0.0:8000"]
+CMD ["archivebox", "server", "--init", "0.0.0.0:8000"]

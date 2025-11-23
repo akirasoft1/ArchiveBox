@@ -1,5 +1,3 @@
-__package__ = 'archivebox.core'
-
 import os
 import sys
 import inspect
@@ -65,7 +63,8 @@ INSTALLED_APPS = [
     'workers',                   # handles starting and managing background workers and processes (orchestrators and actors)
     'crawls',                    # handles Seed, Crawl, and CrawlSchedule models and management
     'personas',                  # handles Persona and session management
-    'core',                      # core django model with Snapshot, ArchiveResult, etc.
+    'tags',                      # handles Tag and KVTag models
+    'core',           # core django model with Snapshot, ArchiveResult, etc.
     'api',                       # Django-Ninja-based Rest API interfaces, config, APIToken model, etc.
 
     # ArchiveBox plugins

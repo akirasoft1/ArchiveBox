@@ -13,8 +13,8 @@ from django.core import checks
 from django.utils import timezone
 from django.utils.functional import classproperty
 
-from base_models.models import ABIDModel, ABIDField
-from machine.models import Process
+from archivebox.base_models.models import ABIDModel, ABIDField
+from archivebox.machine.models import Process
 
 from statemachine import registry, StateMachine, State
 
@@ -377,7 +377,11 @@ class Event(ABIDModel):
 
     objects: EventManager = EventManager.from_queryset(EventQuerySet)()
     
-    child_events: models.RelatedManager['Event']
+    child_events: models.Manager['Event']
+    
+    class Meta:
+        verbose_name = 'Event'
+        verbose_name_plural = 'Events'
     
     @classmethod
     def get_next_timestamp(cls):

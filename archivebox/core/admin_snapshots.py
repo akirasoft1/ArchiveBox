@@ -1,6 +1,4 @@
 
-__package__ = 'archivebox.core'
-
 import os
 from pathlib import Path
 

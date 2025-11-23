@@ -20,7 +20,7 @@ import archivebox
 from abx_pkg import Binary, BinProvider
 from archivebox.base_models.models import ABIDModel, ABIDField, AutoDateTimeField, ModelWithHealthStats
 
-from .detect import get_host_guid, get_os_info, get_vm_info, get_host_network, get_host_stats
+from .detect import get_host_guid, get_os_info, get_vm_info, get_host_stats
 
 _CURRENT_MACHINE = None                              # global cache for the current machine
 _CURRENT_INTERFACE = None                            # global cache for the current network interface
@@ -80,6 +80,10 @@ class Machine(ABIDModel, ModelWithHealthStats):
     # num_uses_succeeded = models.PositiveIntegerField(default=0)
     
     objects: MachineManager = MachineManager()
+
+    class Meta:
+        verbose_name = 'Machine'
+        verbose_name_plural = 'Machines'
     
     networkinterface_set: models.Manager['NetworkInterface']
 
@@ -438,10 +442,17 @@ class Process(ABIDModel):
     # optional mutable state that can be used to trace what the process is doing
     # active_event = models.ForeignKey('Event', null=True, on_delete=models.SET_NULL)
     
-    emitted_events: models.RelatedManager['Event']
-    claimed_events: models.RelatedManager['Event']
+    emitted_events: models.Manager['Event']
+    claimed_events: models.Manager['Event']
     
+    class Meta:
+        app_label = 'archivebox.machine'
+
     objects: ProcessManager = ProcessManager.from_queryset(ProcessQuerySet)()
+
+    class Meta:
+        verbose_name = 'Process'
+        verbose_name_plural = 'Processes'
 
     @classmethod
     def current(cls) -> 'Process':
