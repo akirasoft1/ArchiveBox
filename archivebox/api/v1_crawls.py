@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from ninja import Router, Schema
 
 from core.models import Snapshot
-from crawls.models import Seed, Crawl
+from archivebox.crawls.models import Seed, Crawl
 
 from .auth import API_AUTH_METHODS
 

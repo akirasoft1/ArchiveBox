@@ -46,7 +46,7 @@ def add(urls: str | list[str],
     assert depth in (0, 1), 'Depth must be 0 or 1 (depth >1 is not supported yet)'
     
     # import models once django is set up
-    from crawls.models import Seed, Crawl
+    from archivebox.crawls.models import Seed, Crawl
     from workers.orchestrator import Orchestrator
     from archivebox.base_models.models import get_or_create_system_user_pk
 

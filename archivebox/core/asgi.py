@@ -7,9 +7,15 @@ For more information on this file, see
 https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
 """
 
-from archivebox.config.django import setup_django
+import logging
 
+# Add a logger
+logger = logging.getLogger(__name__)
+
+from archivebox.config.django import setup_django
+logger.info("Setting up Django")
 setup_django(in_memory_db=False, check_db=True)
+logger.info("Django setup complete")
 
 
 # from channels.auth import AuthMiddlewareStack
@@ -19,8 +25,9 @@ from django.core.asgi import get_asgi_application
 
 # from core.routing import websocket_urlpatterns
 
-
+logger.info("Getting ASGI application")
 django_asgi_app = get_asgi_application()
+logger.info("ASGI application loaded")
 
 application = ProtocolTypeRouter(
     {
@@ -31,3 +38,5 @@ application = ProtocolTypeRouter(
         # ),
     }
 )
+logger.info("ProtocolTypeRouter configured")
+

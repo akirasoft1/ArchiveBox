@@ -1,0 +1,2 @@
+
+> /venv/bin/archivebox server --init 0.0.0.0:8000; TS=2025-11-23__23:03:21 VERSION=0.8.6rc3 IN_DOCKER=True IS_TTY=True

@@ -18,7 +18,7 @@ import archivebox
 from archivebox.config import CONSTANTS
 from archivebox.misc.util import parse_date
 
-from machine.models import InstalledBinary
+from archivebox.machine.models import InstalledBinary
 
 
 def obj_to_yaml(obj: Any, indent: int=0) -> str:

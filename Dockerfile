@@ -282,6 +282,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=apt-$TARGETARCH$T
     # && service dbus start \
     && echo "[+] PIP Installing playwright into /venv and CHROMIUM binary into $PLAYWRIGHT_BROWSERS_PATH..." \
     && uv pip install "playwright>=1.49.1" \
+    && uv pip install "pytest>=8.3.3" \ 
     && uv run playwright install chromium --no-shell --with-deps \  
     && export CHROME_BINARY="$(uv run python -c 'from playwright.sync_api import sync_playwright; print(sync_playwright().start().chromium.executable_path)')" \
     && ln -s "$CHROME_BINARY" /usr/bin/chromium-browser \
@@ -303,8 +304,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=apt-$TARGETARCH$T
 
 # Install Node extractor dependencies
 ENV PATH="/home/$ARCHIVEBOX_USER/.npm/bin:$PATH"
+USER root
+WORKDIR "$CODE_DIR"
+RUN chown -R $ARCHIVEBOX_USER:$ARCHIVEBOX_USER "$CODE_DIR"
 USER $ARCHIVEBOX_USER
-WORKDIR "/home/$ARCHIVEBOX_USER/.npm"
 RUN --mount=type=cache,target=/home/archivebox/.npm_cache,sharing=locked,id=npm-$TARGETARCH$TARGETVARIANT,uid=$DEFAULT_PUID,gid=$DEFAULT_PGID \
     echo "[+] NPM Installing node extractor dependencies into /home/$ARCHIVEBOX_USER/.npm..." \
     && npm config set prefix "/home/$ARCHIVEBOX_USER/.npm" \
@@ -353,7 +356,9 @@ RUN --mount=type=bind,source=pyproject.toml,target=/app/pyproject.toml \
     # installs the pip packages that archivebox depends on, defined in pyproject.toml and uv.lock dependencies
 
 # Install ArchiveBox Python package + workspace dependencies from source
+USER root
 COPY --chown=root:root --chmod=755 "." "$CODE_DIR/"
+RUN chown -R $ARCHIVEBOX_USER:$ARCHIVEBOX_USER "$CODE_DIR"
 RUN --mount=type=cache,target=/root/.cache/uv,sharing=locked,id=uv-$TARGETARCH$TARGETVARIANT \
     echo "[*] Installing ArchiveBox Python source code from $CODE_DIR..." \
     && uv sync \

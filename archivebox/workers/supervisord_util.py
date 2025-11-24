@@ -54,7 +54,7 @@ ORCHESTRATOR_WORKER = {
 SERVER_WORKER = lambda host, port: {
     "name": "worker_daphne",
     "command": f"daphne --bind={host} --port={port} --application-close-timeout=600 archivebox.core.asgi:application",
-    "autostart": "false",
+    "autostart": "true",
     "autorestart": "true",
     "stdout_logfile": "logs/worker_daphne.log",
     "redirect_stderr": "true",

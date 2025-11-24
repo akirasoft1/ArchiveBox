@@ -10,7 +10,7 @@ from rich import print
 from statemachine import State, StateMachine
 
 # from workers.actor import ActorType
-from crawls.models import Crawl
+from archivebox.crawls.models import Crawl
 
 
 class CrawlMachine(StateMachine, strict_states=True):

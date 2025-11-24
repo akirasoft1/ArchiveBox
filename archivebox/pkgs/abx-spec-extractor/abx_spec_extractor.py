@@ -199,7 +199,7 @@ class BaseExtractor:
         raise ValueError(f'Binary {self.binary} not found')
     
     def detect_installed_binary(self):
-        from machine.models import InstalledBinary
+        from archivebox.machine.models import InstalledBinary
         # hydrates binary from DB/cache if record of installed version is recent enough
         # otherwise it finds it from scratch by detecting installed version/abspath/sha256 on host
         return InstalledBinary.objects.get_from_db_or_cache(self.BINARY)

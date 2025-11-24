@@ -104,7 +104,7 @@ class Seed(ModelWithOutputDir, ModelWithConfig, ModelWithNotes, ModelWithHealthS
         verbose_name = 'Seed'
         verbose_name_plural = 'Seeds'
         
-        unique_together = (('created_by', 'uri', 'extractor'),('created_by', 'label'))
+        unique_together = (('created_by', 'label'),)
 
 
     @classmethod
@@ -142,7 +142,7 @@ class Seed(ModelWithOutputDir, ModelWithConfig, ModelWithNotes, ModelWithHealthS
 
     @property
     def scheduled_crawl_set(self) -> QuerySet['CrawlSchedule']:
-        from crawls.models import CrawlSchedule
+        from archivebox.crawls.models import CrawlSchedule
         return CrawlSchedule.objects.filter(template__seed_id=self.pk)
 
     @property
@@ -320,7 +320,7 @@ class Crawl(ModelWithOutputDir, ModelWithConfig, ModelWithHealthStats, ModelWith
     )
     
     ### ModelWithStateMachine:
-    state_machine_name = 'crawls.statemachines.CrawlMachine'
+    state_machine_name = 'archivebox.crawls.statemachines.CrawlMachine'
     retry_at_field_name = 'retry_at'
     state_field_name = 'status'
     StatusChoices = ModelWithStateMachine.StatusChoices

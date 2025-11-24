@@ -13,7 +13,7 @@ from archivebox.crawls.models import Crawl, Seed, CrawlSchedule
 
 
 class SeedAdmin(ABIDModelAdmin):
-    list_display = ('abid', 'created_at', 'created_by', 'label', 'notes', 'uri', 'extractor', 'tags_str', 'crawls', 'num_crawls', 'num_snapshots')
+    list_display = ('abid', 'created_at', 'created_by', 'label', 'notes', 'extractor', 'tags_str', 'crawls', 'num_crawls', 'num_snapshots')
     sort_fields = ('abid', 'created_at', 'created_by', 'label', 'notes', 'uri', 'extractor', 'tags_str')
     search_fields = ('abid', 'created_by__username', 'label', 'notes', 'uri', 'extractor', 'tags_str')
     

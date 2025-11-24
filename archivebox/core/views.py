@@ -32,7 +32,7 @@ from archivebox.search import query_search_index
 
 from core.models import Snapshot
 from core.forms import AddLinkForm
-from crawls.models import Seed, Crawl
+from archivebox.crawls.models import Seed, Crawl
 
 
 

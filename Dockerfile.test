@@ -1,0 +1,5 @@
+FROM archivebox/archivebox:latest
+RUN pip install uv
+COPY . /app
+WORKDIR /app
+RUN uv pip install -e .

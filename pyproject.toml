@@ -129,6 +129,7 @@ dependencies = [
     "abx-plugin-readability>=2024.10.28",
     "abx-plugin-mercury>=2024.10.28",
     "abx-plugin-htmltotext>=2024.10.28",
+    "pytest>=8.3.3",
     # TODO: add gallery-dl
     # TODO: add forum-dl
 ]
@@ -244,6 +245,9 @@ exclude = ["archivebox/pkgs/__pycache__"]
 [tool.uv.pip]
 python-version = "3.11"
 # compile-bytecode = true
+
+[tool.pdm.scripts]
+post_install = "uv pip install pytest"
 
 [build-system]
 requires = ["pdm-backend"]

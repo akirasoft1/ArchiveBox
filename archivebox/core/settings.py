@@ -58,14 +58,14 @@ INSTALLED_APPS = [
     'django_object_actions',     # provides easy Django Admin action buttons on change views       https://github.com/crccheck/django-object-actions
 
     # Our ArchiveBox-provided apps
-    'config',                    # ArchiveBox config settings (loaded as a plugin, don't need to add it here) 
-    'machine',                   # handles collecting and storing information about the host machine, network interfaces, installed binaries, etc.
-    'workers',                   # handles starting and managing background workers and processes (orchestrators and actors)
-    'crawls',                    # handles Seed, Crawl, and CrawlSchedule models and management
-    'personas',                  # handles Persona and session management
-    'tags',                      # handles Tag and KVTag models
-    'core',           # core django model with Snapshot, ArchiveResult, etc.
-    'api',                       # Django-Ninja-based Rest API interfaces, config, APIToken model, etc.
+    'archivebox.config',                    # ArchiveBox config settings (loaded as a plugin, don't need to add it here) 
+    'archivebox.machine',                   # handles collecting and storing information about the host machine, network interfaces, installed binaries, etc.
+    'archivebox.workers',                   # handles starting and managing background workers and processes (orchestrators and actors)
+    'archivebox.crawls',                    # handles Seed, Crawl, and CrawlSchedule models and management
+    'archivebox.personas',                  # handles Persona and session management
+    'archivebox.tags',                      # handles Tag and KVTag models
+    'archivebox.core',           # core django model with Snapshot, ArchiveResult, etc.
+    'archivebox.api',                       # Django-Ninja-based Rest API interfaces, config, APIToken model, etc.
 
     # ArchiveBox plugins
     *abx.as_list(abx.pm.hook.get_INSTALLED_APPS()),  # all plugin django-apps found in archivebox/plugins_* and data/user_plugins,

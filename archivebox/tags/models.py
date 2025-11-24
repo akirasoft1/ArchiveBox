@@ -144,7 +144,7 @@ class KVTag(ModelWithReadOnlyFields):
     created_at = AutoDateTimeField(default=None, null=False, db_index=True)
 
     name = models.CharField(null=False, blank=False, max_length=255, db_index=True)
-    value = models.TextField(null=True, blank=True, db_default=Substr('name', StrIndex('name', '=')))
+    value = models.TextField(null=True, blank=True, default=None)
 
     obj_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=False, blank=False, default=None, db_index=True)
     obj_id = models.UUIDField(null=False, blank=False, default=None, db_index=True)

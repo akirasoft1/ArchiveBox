@@ -68,7 +68,7 @@ class ModifiedAccessLogGenerator(access.AccessLogGenerator):
             )
         )
         
-access.AccessLogGenerator.write_entry = ModifiedAccessLogGenerator.write_entry # type: ignore
+# access.AccessLogGenerator.write_entry = ModifiedAccessLogGenerator.write_entry # type: ignore
 
 
 # fix benedict objects to pretty-print/repr more nicely with rich
